@@ -59,12 +59,28 @@ body {
 
 /* Título gigante */
 .alarm-title {
-    margin: 0;
+    margin: 0 auto;
     font-weight: 900;
-    font-size: clamp(50px, 10vw, 200px);
-    /* 🔥 ocupa casi todo el ancho */
-    letter-spacing: 0.02em;
+    font-size: clamp(50px, 12vw, 140px);
+    /* un poco más balanceado */
+    line-height: 1;
+    letter-spacing: 0.01em;
     color: var(--accent);
+    white-space: nowrap;
+    /* 🔒 nunca cortar línea */
+    max-width: 90vw;
+    /* 🔒 nunca más ancho que la pantalla */
+    text-align: center;
+    /* 🔒 siempre centrado */
+}
+
+.alarm-text {
+    font-size: clamp(32px, 4.5vw, 80px);
+    margin: 0 0 14vh 0;
+    /* 👈 agrega espacio debajo del texto */
+    color: var(--fg);
+    white-space: pre-line;
+    font-weight: 600;
 }
 
 /* Contenedor de canchas */
@@ -109,27 +125,18 @@ body {
     /* 🔽 sigue grande pero no desborda */
 }
 
-/* Texto opcional (jugadores) */
-.alarm-title {
-    margin: 0;
-    font-weight: 900;
-    font-size: clamp(40px, 6vw, 110px);
-    /* 🔽 más balanceado */
-    letter-spacing: 0.02em;
-    color: var(--accent);
-}
 
 /* Hora grande fija abajo */
 .plate-clock {
     position: absolute;
     bottom: 4vh;
+    /* 👈 lo sube o baja respecto al borde */
     left: 50%;
     transform: translateX(-50%);
     margin: 0;
     font-weight: 800;
     opacity: 0.8;
     font-size: clamp(32px, 4vw, 72px);
-    /* 🔽 más chico que antes */
 }
 
 /* Marca de agua abajo derecha */
@@ -146,15 +153,18 @@ body {
 /* Logo del reloj (cuando no hay placa) */
 .brand-clock-wrap {
     position: absolute;
-    bottom: 3vh;
+    top: 0vh;
+    /* 👈 ahora va arriba */
     left: 0;
     right: 0;
     text-align: center;
 }
 
+
 .brand-clock {
-    height: clamp(140px, 16vw, 260px);
+    height: clamp(220px, 16vw, 300px);
     opacity: 0.95;
+
 }
 
 /* Video fullscreen */
