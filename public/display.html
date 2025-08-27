@@ -13,26 +13,20 @@
     <div class="display-root">
         <!-- Reloj principal -->
         <div id="clock" class="clock">00:00:00</div>
-        <!-- Logo del reloj -->
+        <!-- Logo debajo del reloj -->
         <div id="brandClockWrap" class="brand-clock-wrap">
-            <img src="../assets/logo.png" alt="Ciclo Padel" class="brand-clock" />
+            <img src="../assets/logo 2.png" alt="Ciclo Padel" class="brand-clock" />
         </div>
+
+        <!-- Video fullscreen -->
+        <video id="promoVideo" class="promo-video" playsinline muted></video>
 
         <!-- Placa de alarma -->
         <div id="alarmPlate" class="alarm-plate" aria-hidden="true">
-            <!-- Título fijo -->
             <h2 id="alarmTitle" class="alarm-title">Turno Finalizado</h2>
-
-            <!-- Cuadros de canchas -->
             <div id="courtContainer" class="court-container"></div>
-
-            <!-- Texto multilínea (jugadores, etc.) -->
             <p id="alarmText" class="alarm-text"></p>
-
-            <!-- Hora abajo -->
             <div id="plateClock" class="plate-clock">00:00:00</div>
-
-            <!-- Logo como marca de agua -->
             <img src="../assets/logo.png" alt="Ciclo Padel" class="brand-watermark" />
         </div>
     </div>
@@ -58,18 +52,31 @@
         const courtContainer = document.getElementById('courtContainer');
         const aText = document.getElementById('alarmText');
         const plateClock = document.getElementById('plateClock');
-        let hideT = null;
+        const videoEl = document.getElementById('promoVideo');
 
+        function hideClockAndPlate() {
+            clock.style.display = "none";
+            brandClockWrap.style.display = "none";
+            plate.classList.remove('visible');
+            plate.setAttribute('aria-hidden', 'true');
+        }
+        function showClock() {
+            clock.style.display = "";
+            brandClockWrap.style.display = "";
+        }
+        function hideVideo() {
+            videoEl.pause();
+            videoEl.removeAttribute('src');
+            videoEl.load();
+            videoEl.classList.remove('visible');
+        }
+
+        let hideT = null;
         let beep; try { beep = new Audio('../../beep.mp3'); } catch (e) { beep = null; }
 
         function showForThirtySeconds(canchas, mensaje) {
-            // Título fijo
-            // (lo dejamos como "Turno Finalizado" definido en el HTML/CSS)
-
-            // Texto multilínea desde el control (si viene vacío, no mostramos nada)
+            hideVideo();
             aText.textContent = (mensaje && mensaje.trim()) ? mensaje : '';
-
-            // Limpiar y armar cuadros por cancha
             courtContainer.innerHTML = '';
             (canchas || []).forEach(n => {
                 const box = document.createElement('div');
@@ -80,23 +87,17 @@
         `;
                 courtContainer.appendChild(box);
             });
-
             plateClock.textContent = nowHHMMSS();
-
-            // Mostrar placa y ocultar reloj + logo del reloj
             plate.classList.add('visible');
             plate.setAttribute('aria-hidden', 'false');
             clock.style.display = "none";
             brandClockWrap.style.display = "none";
-
             if (beep) { try { beep.currentTime = 0; beep.play(); } catch (e) { } }
             if (hideT) clearTimeout(hideT);
             hideT = setTimeout(() => {
                 plate.classList.remove('visible');
                 plate.setAttribute('aria-hidden', 'true');
-                // Mostrar de nuevo reloj + logo del reloj
-                clock.style.display = "";
-                brandClockWrap.style.display = "";
+                showClock();
             }, 30_000);
         }
 
@@ -106,13 +107,34 @@
                 const arr = Array.isArray(canchas) ? canchas : (typeof canchas === 'number' ? [canchas] : []);
                 showForThirtySeconds(arr, mensaje);
             });
-
             window.CicloAPI.onDisplay('display:hideAlarm', () => {
                 if (hideT) clearTimeout(hideT);
                 plate.classList.remove('visible');
                 plate.setAttribute('aria-hidden', 'true');
-                clock.style.display = "";
-                brandClockWrap.style.display = "";
+                showClock();
+            });
+            window.CicloAPI.onDisplay('display:playVideo', ({ path }) => {
+                plate.classList.remove('visible');
+                plate.setAttribute('aria-hidden', 'true');
+                hideClockAndPlate();
+                const fileUrl = path.startsWith('file://') ? path : 'file:///' + path.replace(/\\/g, '/');
+                videoEl.src = fileUrl;
+                videoEl.loop = true;
+                videoEl.muted = false;
+                videoEl.classList.add('visible');
+                videoEl.play().catch(() => { });
+            });
+            window.CicloAPI.onDisplay('display:pauseVideo', () => {
+                if (!videoEl.classList.contains('visible')) return;
+                videoEl.pause();
+            });
+            window.CicloAPI.onDisplay('display:resumeVideo', () => {
+                if (!videoEl.classList.contains('visible')) return;
+                videoEl.play().catch(() => { });
+            });
+            window.CicloAPI.onDisplay('display:stopVideo', () => {
+                hideVideo();
+                showClock();
             });
         }
     </script>

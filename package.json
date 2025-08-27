@@ -35,7 +35,7 @@
       "target": [
         "nsis"
       ],
-      "icon": "public/icon.ico"
+      "icon": "assets/logo.ico"
     }
   }
 }

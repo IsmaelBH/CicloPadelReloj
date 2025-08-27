@@ -6,16 +6,17 @@ let controlWindow = null;
 let displayWindow = null;
 
 function createWindows() {
-    // Eliminar completamente el menú por defecto (File/Edit/View/…)
+    // Quitar menú por defecto
     Menu.setApplicationMenu(null);
 
-    // Ventana de control (operador)
+    // Ventana de control
     controlWindow = new BrowserWindow({
-        width: 900,
-        height: 650,
+        width: 1280,
+        height: 800,
         minWidth: 800,
         minHeight: 600,
-        autoHideMenuBar: true, // oculta la barra de menú (aunque se presione Alt)
+        autoHideMenuBar: true,
+        icon: path.join(__dirname, 'assets', 'logo.ico'),
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             contextIsolation: true,
@@ -25,12 +26,13 @@ function createWindows() {
     });
     controlWindow.loadFile(path.join(__dirname, 'public', 'control.html'));
 
-    // Ventana de display (TV)
+    // Ventana de display
     displayWindow = new BrowserWindow({
         width: 1280,
         height: 720,
         backgroundColor: '#000000',
-        autoHideMenuBar: true, // oculta la barra de menú (aunque se presione Alt)
+        autoHideMenuBar: true,
+        icon: path.join(__dirname, 'assets', 'logo.ico'),
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             contextIsolation: true,
@@ -40,7 +42,7 @@ function createWindows() {
     });
     displayWindow.loadFile(path.join(__dirname, 'public', 'display.html'));
 
-    // Intentar mover el display al segundo monitor (HDMI) si existe
+    // Intentar posicionar en 2do monitor
     try {
         const displays = screen.getAllDisplays();
         if (displays.length > 1) {
@@ -57,7 +59,6 @@ function createWindows() {
 
 app.whenReady().then(() => {
     createWindows();
-
     app.on('activate', () => {
         if (BrowserWindow.getAllWindows().length === 0) createWindows();
     });
@@ -69,11 +70,11 @@ app.on('window-all-closed', () => {
 
 /* ===== IPC: Control -> Display ===== */
 ipcMain.on('display:showAlarm', (_evt, payload) => {
-    if (displayWindow) displayWindow.webContents.send('display:showAlarm', payload);
+    displayWindow && displayWindow.webContents.send('display:showAlarm', payload);
 });
 
 ipcMain.on('display:hideAlarm', () => {
-    if (displayWindow) displayWindow.webContents.send('display:hideAlarm');
+    displayWindow && displayWindow.webContents.send('display:hideAlarm');
 });
 
 ipcMain.on('display:toggleFullscreen', () => {
@@ -82,7 +83,24 @@ ipcMain.on('display:toggleFullscreen', () => {
     displayWindow.setFullScreen(!isFS);
 });
 
-// Reservado por si querés sincronizar algo a futuro
-ipcMain.on('display:ping', () => {
-    if (displayWindow) displayWindow.webContents.send('display:pong', Date.now());
+/* ===== IPC: Video archivo ===== */
+ipcMain.on('display:playVideo', (_evt, { path: filePath }) => {
+    displayWindow && displayWindow.webContents.send('display:playVideo', { path: filePath });
+});
+ipcMain.on('display:pauseVideo', () => {
+    displayWindow && displayWindow.webContents.send('display:pauseVideo');
+});
+ipcMain.on('display:resumeVideo', () => {
+    displayWindow && displayWindow.webContents.send('display:resumeVideo');
+});
+ipcMain.on('display:stopVideo', () => {
+    displayWindow && displayWindow.webContents.send('display:stopVideo');
+});
+
+/* ===== IPC: Video demo embebido ===== */
+ipcMain.on('display:playDemo', () => {
+    // Resolvemos la ruta al demo incluso dentro del .asar
+    // __dirname apunta a la raíz de la app empaquetada
+    const demoFile = path.join(__dirname, 'assets', 'demo.mp4');
+    displayWindow && displayWindow.webContents.send('display:playVideo', { path: demoFile });
 });
