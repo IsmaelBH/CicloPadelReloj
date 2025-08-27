@@ -1,0 +1,15 @@
+appId: com.ciclo.padel.reloj
+productName: Ciclo Padel Reloj
+directories:
+  output: dist
+files:
+  - "main.js"
+  - "preload.js"
+  - "public/**/*"
+  - "src/**/*"
+extraResources:
+  - from: public/beep.mp3
+    to: beep.mp3
+win:
+  target:
+    - nsis

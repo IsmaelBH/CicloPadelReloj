@@ -1,0 +1,41 @@
+{
+  "name": "ciclo-padel-reloj",
+  "version": "1.0.0",
+  "description": "Reloj en tiempo real y alarmas por cancha para Ciclo Padel (app de escritorio)",
+  "main": "main.js",
+  "author": "IsmaelBH",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.ciclo.padel.reloj",
+    "productName": "Ciclo Padel Reloj",
+    "files": [
+      "main.js",
+      "preload.js",
+      "public/**/*",
+      "src/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "public/beep.mp3",
+        "to": "beep.mp3"
+      }
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "public/icon.ico"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+# dependencias
+node_modules/
+
+# builds
+dist/
+out/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# sistema operativo
+.DS_Store
+Thumbs.db
+
+# VSCode
+.vscode/
+
+# cache electron-builder
+.cache/

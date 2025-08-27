@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ciclo Padel – Pantalla</title>
+    <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body>
+    <div class="display-root">
+        <!-- Reloj principal -->
+        <div id="clock" class="clock">00:00:00</div>
+        <!-- Logo del reloj -->
+        <div id="brandClockWrap" class="brand-clock-wrap">
+            <img src="../assets/logo.png" alt="Ciclo Padel" class="brand-clock" />
+        </div>
+
+        <!-- Placa de alarma -->
+        <div id="alarmPlate" class="alarm-plate" aria-hidden="true">
+            <!-- Título fijo -->
+            <h2 id="alarmTitle" class="alarm-title">Turno Finalizado</h2>
+
+            <!-- Cuadros de canchas -->
+            <div id="courtContainer" class="court-container"></div>
+
+            <!-- Texto multilínea (jugadores, etc.) -->
+            <p id="alarmText" class="alarm-text"></p>
+
+            <!-- Hora abajo -->
+            <div id="plateClock" class="plate-clock">00:00:00</div>
+
+            <!-- Logo como marca de agua -->
+            <img src="../assets/logo.png" alt="Ciclo Padel" class="brand-watermark" />
+        </div>
+    </div>
+
+    <script>
+        function pad(n) { return n.toString().padStart(2, '0'); }
+        function nowHHMMSS() {
+            const now = new Date();
+            return `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+        }
+        function tick() {
+            const t = nowHHMMSS();
+            document.getElementById('clock').textContent = t;
+            if (document.getElementById('alarmPlate').classList.contains('visible')) {
+                document.getElementById('plateClock').textContent = t;
+            }
+        }
+        setInterval(tick, 250); tick();
+
+        const clock = document.getElementById('clock');
+        const brandClockWrap = document.getElementById('brandClockWrap');
+        const plate = document.getElementById('alarmPlate');
+        const courtContainer = document.getElementById('courtContainer');
+        const aText = document.getElementById('alarmText');
+        const plateClock = document.getElementById('plateClock');
+        let hideT = null;
+
+        let beep; try { beep = new Audio('../../beep.mp3'); } catch (e) { beep = null; }
+
+        function showForThirtySeconds(canchas, mensaje) {
+            // Título fijo
+            // (lo dejamos como "Turno Finalizado" definido en el HTML/CSS)
+
+            // Texto multilínea desde el control (si viene vacío, no mostramos nada)
+            aText.textContent = (mensaje && mensaje.trim()) ? mensaje : '';
+
+            // Limpiar y armar cuadros por cancha
+            courtContainer.innerHTML = '';
+            (canchas || []).forEach(n => {
+                const box = document.createElement('div');
+                box.className = 'court-box';
+                box.innerHTML = `
+          <p class="court-label">CANCHA</p>
+          <p class="court-number">${n}</p>
+        `;
+                courtContainer.appendChild(box);
+            });
+
+            plateClock.textContent = nowHHMMSS();
+
+            // Mostrar placa y ocultar reloj + logo del reloj
+            plate.classList.add('visible');
+            plate.setAttribute('aria-hidden', 'false');
+            clock.style.display = "none";
+            brandClockWrap.style.display = "none";
+
+            if (beep) { try { beep.currentTime = 0; beep.play(); } catch (e) { } }
+            if (hideT) clearTimeout(hideT);
+            hideT = setTimeout(() => {
+                plate.classList.remove('visible');
+                plate.setAttribute('aria-hidden', 'true');
+                // Mostrar de nuevo reloj + logo del reloj
+                clock.style.display = "";
+                brandClockWrap.style.display = "";
+            }, 30_000);
+        }
+
+        if (window.CicloAPI) {
+            window.CicloAPI.onDisplay('display:showAlarm', (payload) => {
+                const { canchas, mensaje } = payload || {};
+                const arr = Array.isArray(canchas) ? canchas : (typeof canchas === 'number' ? [canchas] : []);
+                showForThirtySeconds(arr, mensaje);
+            });
+
+            window.CicloAPI.onDisplay('display:hideAlarm', () => {
+                if (hideT) clearTimeout(hideT);
+                plate.classList.remove('visible');
+                plate.setAttribute('aria-hidden', 'true');
+                clock.style.display = "";
+                brandClockWrap.style.display = "";
+            });
+        }
+    </script>
+</body>
+
+</html>

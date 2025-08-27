@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ciclo Padel – Control</title>
+    <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body>
+    <div class="control-root">
+        <div class="header">
+            <h1>Panel de Control</h1>
+            <div class="actions">
+                <button class="btn" id="btnFS" type="button">Pantalla: Fullscreen ON/OFF</button>
+                <button class="btn secondary" id="btnOcultarAlarma" type="button">Ocultar Alarma</button>
+            </div>
+        </div>
+
+        <p class="small">
+            La TV muestra SIEMPRE la hora actual. Cuando envíes una placa, aparece durante <strong>30 segundos</strong>
+            y luego vuelve al reloj.
+        </p>
+
+        <div class="row">
+            <div class="card">
+                <h2>Seleccionar canchas</h2>
+                <div class="field">
+                    <button class="btn" data-cancha="1" id="sel1" type="button">Cancha 1</button>
+                    <button class="btn" data-cancha="2" id="sel2" type="button">Cancha 2</button>
+                    <button class="btn" data-cancha="3" id="sel3" type="button">Cancha 3</button>
+                </div>
+                <div class="field">
+                    <span>Seleccionadas:</span> <strong id="seleccionadas" class="badge">Ninguna</strong>
+                </div>
+
+                <h2 style="margin-top:12px;">Texto de placa (opcional)</h2>
+                <div class="field" style="width:100%; align-items:flex-start;">
+                    <textarea id="msgInput" rows="2" placeholder="Player 1 - Player 2"
+                        style="flex:1; padding:10px 12px; border-radius:10px; border:1px solid #ccc; background:#fff; color:#111; resize:vertical;"></textarea>
+                    <button class="btn secondary" id="clearMsg" type="button">Vaciar</button>
+                </div>
+
+                <div class="field">
+                    <button class="btn" id="enviar" type="button">Enviar placa (30s)</button>
+                    <button class="btn secondary" id="limpiar" type="button">Limpiar selección</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Envío rápido</h2>
+                <div class="field">
+                    <button class="btn" id="quick1" type="button">Enviar Cancha 1</button>
+                    <button class="btn" id="quick2" type="button">Enviar Cancha 2</button>
+                    <button class="btn" id="quick3" type="button">Enviar Cancha 3</button>
+                </div>
+                <p class="small">Usa el texto de arriba si lo completaste; si no, solo “Turno Finalizado”.</p>
+            </div>
+
+            <div class="card">
+                <h2>Estado</h2>
+                <div class="field">
+                    <span>La pantalla está mostrando:</span>
+                    <strong id="estadoPantalla" class="badge">Reloj</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Importante: este JS está en /public -->
+    <script defer src="./renderer-control.js"></script>
+</body>
+
+</html>
