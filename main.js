@@ -20,11 +20,17 @@ function createWindows() {
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             contextIsolation: true,
-            nodeIntegration: false
+            nodeIntegration: false,
         },
-        title: 'Ciclo Padel – Control'
+        title: 'Ciclo Padel – Control',
     });
     controlWindow.loadFile(path.join(__dirname, 'public', 'control.html'));
+
+    // 🔥 Si el Panel de Control se cierra, cerramos TODA la app
+    controlWindow.on('closed', () => {
+        controlWindow = null;
+        app.quit();
+    });
 
     // Ventana de display
     displayWindow = new BrowserWindow({
@@ -36,11 +42,16 @@ function createWindows() {
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             contextIsolation: true,
-            nodeIntegration: false
+            nodeIntegration: false,
         },
-        title: 'Ciclo Padel – Pantalla'
+        title: 'Ciclo Padel – Pantalla',
     });
     displayWindow.loadFile(path.join(__dirname, 'public', 'display.html'));
+
+    // Limpiar referencia al cerrarse la Display (por prolijidad)
+    displayWindow.on('closed', () => {
+        displayWindow = null;
+    });
 
     // Intentar posicionar en 2do monitor
     try {
@@ -51,7 +62,7 @@ function createWindows() {
                 x: external.bounds.x + 50,
                 y: external.bounds.y + 50,
                 width: Math.min(1600, external.workArea.width - 100),
-                height: Math.min(900, external.workArea.height - 100)
+                height: Math.min(900, external.workArea.height - 100),
             });
         }
     } catch (_) { }
@@ -64,8 +75,9 @@ app.whenReady().then(() => {
     });
 });
 
+// 🔧 Si se cierran todas las ventanas, cerramos la app (incluye macOS)
 app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') app.quit();
+    app.quit();
 });
 
 /* ===== IPC: Control -> Display ===== */
@@ -100,7 +112,6 @@ ipcMain.on('display:stopVideo', () => {
 /* ===== IPC: Video demo embebido ===== */
 ipcMain.on('display:playDemo', () => {
     // Resolvemos la ruta al demo incluso dentro del .asar
-    // __dirname apunta a la raíz de la app empaquetada
     const demoFile = path.join(__dirname, 'assets', 'demo.mp4');
     displayWindow && displayWindow.webContents.send('display:playVideo', { path: demoFile });
 });
