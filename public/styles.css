@@ -31,8 +31,8 @@ body {
 
 /* Reloj principal */
 .clock {
-    font-size: 22vw;
-    letter-spacing: 0.02em;
+    font-size: 23vw;
+    letter-spacing: 0.01em;
     font-weight: 700;
     text-shadow: 0 0 12px rgba(255, 255, 255, 0.15);
 }
@@ -61,11 +61,11 @@ body {
 .alarm-title {
     margin: 0 auto;
     font-weight: 900;
-    font-size: clamp(50px, 12vw, 140px);
+    font-size: clamp(50px, 12vw, 115px);
     /* un poco más balanceado */
     line-height: 1;
     letter-spacing: 0.01em;
-    color: var(--accent);
+    color: var(--fg);
     white-space: nowrap;
     /* 🔒 nunca cortar línea */
     max-width: 92vw;
@@ -73,6 +73,8 @@ body {
     text-align: center;
     /* 🔒 siempre centrado */
     top: 15vh;
+    text-transform: uppercase;
+    /* Título gigante */
 }
 
 /* Texto opcional del cajero: SUBIR sin afectar a los demás */
@@ -84,7 +86,7 @@ body {
     /* espaciado entre letras */
     text-transform: uppercase;
     /* en mayúsculas */
-    font-size: clamp(28px, 3vw, 58px);
+    font-size: clamp(26px, 2.6vw, 56px);
     /* mismo tamaño adaptable */
     opacity: 0.95;
     color: var(--fg);
@@ -103,7 +105,7 @@ body {
     align-items: center;
     flex-wrap: wrap;
     gap: 3vw;
-    max-width: 94vw;
+    max-width: 110vw;
 }
 
 /* Cada cancha bien grande */
@@ -112,11 +114,11 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    border: 5px solid var(--accent);
+    border: 8px solid var(--accent);
     border-radius: 18px;
-    padding: 2rem;
-    min-width: clamp(220px, 26vw, 320px);
-    aspect-ratio: 3 / 3;
+    padding: 1.5rem;
+    min-width: clamp(180px, 20vw, 260px);
+    aspect-ratio: 3 / 2.5;
     background: transparent;
 }
 
@@ -144,23 +146,12 @@ body {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    bottom: 2vh;
+    bottom: 4vh;
     /* bajalo/subilo sin tocar el resto */
     margin: 0;
     font-weight: 800;
     opacity: 0.8;
-    font-size: clamp(32px, 4vw, 72px);
-}
-
-/* Marca de agua abajo derecha */
-.brand-watermark {
-    position: absolute;
-    right: 3vw;
-    bottom: 1vh;
-    height: clamp(120px, 14vw, 240px);
-    /* más grande */
-    opacity: 0.6;
-    pointer-events: none;
+    font-size: clamp(38px, 5vw, 86px);
 }
 
 /* Logo del reloj (cuando no hay placa) */
@@ -175,7 +166,7 @@ body {
 
 
 .brand-clock {
-    height: clamp(220px, 16vw, 300px);
+    height: clamp(240px, 18vw, 320px);
     opacity: 0.95;
 
 }
