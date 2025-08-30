@@ -1,5 +1,5 @@
 {
-  "name": "ciclo-padel-reloj",
+  "name": "ciclo-padel-reloj-blue-version",
   "version": "1.0.0",
   "description": "Reloj en tiempo real y alarmas por cancha para Ciclo Padel (app de escritorio)",
   "main": "main.js",
@@ -16,7 +16,7 @@
   },
   "build": {
     "appId": "com.ciclo.padel.reloj",
-    "productName": "Ciclo Padel Reloj",
+    "productName": "Ciclo Padel Reloj - Blue Version",
     "files": [
       "main.js",
       "preload.js",

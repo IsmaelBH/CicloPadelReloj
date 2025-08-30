@@ -1,8 +1,12 @@
 :root {
-    --bg: #000;
+    --bg: #0037ff;
+    /* azul eléctrico */
     --fg: #fff;
-    --accent: #02548C;
+    /* texto blanco */
+    --accent: #fff;
+    /* el cuadro de CANCHA en blanco */
 }
+
 
 * {
     box-sizing: border-box;
@@ -42,7 +46,7 @@ body {
     position: absolute;
     inset: 0;
     display: none;
-    background: rgba(0, 0, 0, 0.88);
+    background: var(--bg);
     text-align: center;
     padding: 4vh 4vw;
     overflow: hidden;
@@ -256,7 +260,7 @@ body {
 
 .btn {
     background: var(--accent);
-    color: #fff;
+    color: #333;
     border: none;
     border-radius: 10px;
     padding: 10px 14px;
@@ -276,7 +280,7 @@ body {
 
 .badge {
     background: var(--accent);
-    color: #fff;
+    color: #333;
     border-radius: 999px;
     padding: 4px 10px;
     font-size: 13px;
