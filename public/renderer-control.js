@@ -54,24 +54,52 @@
             if (estadoPantalla) estadoPantalla.textContent = 'Reloj';
         });
 
-        // ==== VIDEOS ====
+        // ==== MEDIA (video/imágenes) ====
         const videoFileInput = byId('videoFile');
         const videoName = byId('videoName');
-        let selectedVideoPath = '';
+        let selectedPath = '';
+        let selectedMime = '';
+
+        const isImageFile = (mimeOrPath) => {
+            if (!mimeOrPath) return false;
+            if (mimeOrPath.startsWith?.('image/')) return true;
+            const p = (mimeOrPath || '').toLowerCase();
+            return p.endsWith('.jpg') || p.endsWith('.jpeg') || p.endsWith('.png') || p.endsWith('.gif') || p.endsWith('.webp') || p.endsWith('.bmp');
+        };
+        const isVideoFile = (mimeOrPath) => {
+            if (!mimeOrPath) return false;
+            if (mimeOrPath.startsWith?.('video/')) return true;
+            const p = (mimeOrPath || '').toLowerCase();
+            return p.endsWith('.mp4') || p.endsWith('.webm') || p.endsWith('.mov') || p.endsWith('.mkv') || p.endsWith('.avi');
+        };
 
         if (videoFileInput) {
             videoFileInput.addEventListener('change', (e) => {
                 const f = e.target.files && e.target.files[0];
-                selectedVideoPath = f ? (f.path || '') : '';
-                videoName.textContent = f ? (f.name || selectedVideoPath) : 'Ningún archivo seleccionado';
+                selectedPath = f ? (f.path || '') : '';
+                selectedMime = f ? (f.type || '') : '';
+                videoName.textContent = f ? (f.name || selectedPath) : 'Ningún archivo seleccionado';
             });
         }
 
         onClick('btnPlayVideo', () => {
             if (!api) return;
-            if (!selectedVideoPath) { alert('Primero elegí un archivo de video.'); return; }
-            api.playVideo({ path: selectedVideoPath });
+            if (!selectedPath || !isVideoFile(selectedMime || selectedPath)) {
+                alert('Elegí un archivo de video válido (mp4/webm/etc.).');
+                return;
+            }
+            api.playVideo({ path: selectedPath });
             if (estadoPantalla) estadoPantalla.textContent = 'Video (loop)';
+        });
+
+        onClick('btnShowImage', () => {
+            if (!api) return;
+            if (!selectedPath || !isImageFile(selectedMime || selectedPath)) {
+                alert('Elegí un archivo de imagen válido (jpg/png/webp/etc.).');
+                return;
+            }
+            api.showImage({ path: selectedPath });
+            if (estadoPantalla) estadoPantalla.textContent = 'Imagen';
         });
 
         let paused = false;
@@ -90,7 +118,7 @@
 
         onClick('btnStopVideo', () => {
             if (!api) return;
-            api.stopVideo();
+            api.stopVideo(); // también oculta imagen en display (ver display.html)
             if (estadoPantalla) estadoPantalla.textContent = 'Reloj';
             paused = false;
             const btn = byId('btnPauseResume');
@@ -100,7 +128,7 @@
         // Demo embebido
         onClick('btnPlayDemo', () => {
             if (!api) return;
-            api.playDemo(); // resuelve ruta en main.js
+            api.playDemo();
             if (estadoPantalla) estadoPantalla.textContent = 'Video demo (loop)';
         });
 

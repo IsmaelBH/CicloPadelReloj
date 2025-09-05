@@ -6,7 +6,7 @@ let controlWindow = null;
 let displayWindow = null;
 
 function createWindows() {
-    // Quitar menú por defecto
+    // Sin menú
     Menu.setApplicationMenu(null);
 
     // Ventana de control
@@ -26,7 +26,7 @@ function createWindows() {
     });
     controlWindow.loadFile(path.join(__dirname, 'public', 'control.html'));
 
-    // 🔥 Si el Panel de Control se cierra, cerramos TODA la app
+    // Si se cierra el Panel, cerramos TODA la app
     controlWindow.on('closed', () => {
         controlWindow = null;
         app.quit();
@@ -48,12 +48,9 @@ function createWindows() {
     });
     displayWindow.loadFile(path.join(__dirname, 'public', 'display.html'));
 
-    // Limpiar referencia al cerrarse la Display (por prolijidad)
-    displayWindow.on('closed', () => {
-        displayWindow = null;
-    });
+    displayWindow.on('closed', () => { displayWindow = null; });
 
-    // Intentar posicionar en 2do monitor
+    // Intentar poner Display en el 2º monitor si existe
     try {
         const displays = screen.getAllDisplays();
         if (displays.length > 1) {
@@ -75,27 +72,27 @@ app.whenReady().then(() => {
     });
 });
 
-// 🔧 Si se cierran todas las ventanas, cerramos la app (incluye macOS)
-app.on('window-all-closed', () => {
-    app.quit();
-});
+// Cerrar app cuando no quedan ventanas (incluye macOS)
+app.on('window-all-closed', () => { app.quit(); });
 
 /* ===== IPC: Control -> Display ===== */
+
+// Alarma (placa 60s)
 ipcMain.on('display:showAlarm', (_evt, payload) => {
     displayWindow && displayWindow.webContents.send('display:showAlarm', payload);
 });
-
 ipcMain.on('display:hideAlarm', () => {
     displayWindow && displayWindow.webContents.send('display:hideAlarm');
 });
 
+// Fullscreen ON/OFF
 ipcMain.on('display:toggleFullscreen', () => {
     if (!displayWindow) return;
-    const isFS = displayWindow.isFullScreen();
-    displayWindow.setFullScreen(!isFS);
+    displayWindow.setFullScreen(!displayWindow.isFullScreen());
 });
 
-/* ===== IPC: Video archivo ===== */
+/* ===== IPC: Media ===== */
+// Video (compatibilidad con tu flujo actual)
 ipcMain.on('display:playVideo', (_evt, { path: filePath }) => {
     displayWindow && displayWindow.webContents.send('display:playVideo', { path: filePath });
 });
@@ -109,9 +106,14 @@ ipcMain.on('display:stopVideo', () => {
     displayWindow && displayWindow.webContents.send('display:stopVideo');
 });
 
-/* ===== IPC: Video demo embebido ===== */
+// Imagen estática
+ipcMain.on('display:showImage', (_evt, { path: filePath }) => {
+    displayWindow && displayWindow.webContents.send('display:showImage', { path: filePath });
+});
+
+// Demo embebido (video)
 ipcMain.on('display:playDemo', () => {
-    // Resolvemos la ruta al demo incluso dentro del .asar
     const demoFile = path.join(__dirname, 'assets', 'demo.mp4');
     displayWindow && displayWindow.webContents.send('display:playVideo', { path: demoFile });
 });
+

@@ -13,20 +13,21 @@
     <div class="display-root">
         <!-- Reloj principal -->
         <div id="clock" class="clock">00:00:00</div>
-        <!-- Logo debajo del reloj -->
+        <!-- Logo arriba del reloj -->
         <div id="brandClockWrap" class="brand-clock-wrap">
             <img src="../assets/logo 2.png" alt="Ciclo Padel" class="brand-clock" />
         </div>
 
         <!-- Video fullscreen -->
         <video id="promoVideo" class="promo-video" playsinline muted></video>
+        <!-- Imagen fullscreen -->
+        <img id="promoImage" class="promo-image" alt="" />
 
         <!-- Placa de alarma -->
         <div id="alarmPlate" class="alarm-plate" aria-hidden="true">
             <h2 id="alarmTitle" class="alarm-title">Turno Finalizado</h2>
             <div id="courtContainer" class="court-container"></div>
             <p id="alarmText" class="alarm-text"></p>
-            <div id="plateClock" class="plate-clock">00:00:00</div>
         </div>
     </div>
 
@@ -39,9 +40,6 @@
         function tick() {
             const t = nowHHMMSS();
             document.getElementById('clock').textContent = t;
-            if (document.getElementById('alarmPlate').classList.contains('visible')) {
-                document.getElementById('plateClock').textContent = t;
-            }
         }
         setInterval(tick, 250); tick();
 
@@ -50,8 +48,8 @@
         const plate = document.getElementById('alarmPlate');
         const courtContainer = document.getElementById('courtContainer');
         const aText = document.getElementById('alarmText');
-        const plateClock = document.getElementById('plateClock');
         const videoEl = document.getElementById('promoVideo');
+        const imageEl = document.getElementById('promoImage');
 
         function hideClockAndPlate() {
             clock.style.display = "none";
@@ -63,59 +61,66 @@
             clock.style.display = "";
             brandClockWrap.style.display = "";
         }
-        function hideVideo() {
+        function hideMedia() {
+            // video
             videoEl.pause();
             videoEl.removeAttribute('src');
             videoEl.load();
             videoEl.classList.remove('visible');
+            // imagen
+            imageEl.removeAttribute('src');
+            imageEl.classList.remove('visible');
         }
 
         let hideT = null;
         let beep; try { beep = new Audio('../../beep.mp3'); } catch (e) { beep = null; }
 
-        function showForThirtySeconds(canchas, mensaje) {
-            hideVideo();
+        function showForSixtySeconds(canchas, mensaje) {
+            hideMedia();
             aText.textContent = (mensaje && mensaje.trim()) ? mensaje : '';
             courtContainer.innerHTML = '';
             (canchas || []).forEach(n => {
                 const box = document.createElement('div');
                 box.className = 'court-box';
-                box.innerHTML = `
-          <p class="court-label">CANCHA</p>
-          <p class="court-number">${n}</p>
-        `;
+                box.innerHTML = `<p class="court-number">${n}</p>`;
                 courtContainer.appendChild(box);
             });
-            plateClock.textContent = nowHHMMSS();
+
             plate.classList.add('visible');
             plate.setAttribute('aria-hidden', 'false');
             clock.style.display = "none";
             brandClockWrap.style.display = "none";
+
             if (beep) { try { beep.currentTime = 0; beep.play(); } catch (e) { } }
+
             if (hideT) clearTimeout(hideT);
             hideT = setTimeout(() => {
                 plate.classList.remove('visible');
                 plate.setAttribute('aria-hidden', 'true');
                 showClock();
-            }, 30_000);
+            }, 60_000); // 1 minuto
         }
 
         if (window.CicloAPI) {
             window.CicloAPI.onDisplay('display:showAlarm', (payload) => {
                 const { canchas, mensaje } = payload || {};
                 const arr = Array.isArray(canchas) ? canchas : (typeof canchas === 'number' ? [canchas] : []);
-                showForThirtySeconds(arr, mensaje);
+                showForSixtySeconds(arr, mensaje);
             });
+
             window.CicloAPI.onDisplay('display:hideAlarm', () => {
                 if (hideT) clearTimeout(hideT);
                 plate.classList.remove('visible');
                 plate.setAttribute('aria-hidden', 'true');
                 showClock();
             });
+
+            // Video loop
             window.CicloAPI.onDisplay('display:playVideo', ({ path }) => {
                 plate.classList.remove('visible');
                 plate.setAttribute('aria-hidden', 'true');
                 hideClockAndPlate();
+                hideMedia(); // por las dudas
                 const fileUrl = path.startsWith('file://') ? path : 'file:///' + path.replace(/\\/g, '/');
                 videoEl.src = fileUrl;
                 videoEl.loop = true;
@@ -132,8 +137,19 @@
                 videoEl.play().catch(() => { });
             });
             window.CicloAPI.onDisplay('display:stopVideo', () => {
-                hideVideo();
+                hideMedia(); // ahora también oculta imagen
                 showClock();
+            });
+
+            // Imagen estática
+            window.CicloAPI.onDisplay('display:showImage', ({ path }) => {
+                plate.classList.remove('visible');
+                plate.setAttribute('aria-hidden', 'true');
+                hideClockAndPlate();
+                hideMedia(); // por si había video
+                const fileUrl = path.startsWith('file://') ? path : 'file:///' + path.replace(/\\/g, '/');
+                imageEl.src = fileUrl;
+                imageEl.classList.add('visible');
             });
         }
     </script>

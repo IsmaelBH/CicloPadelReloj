@@ -41,7 +41,7 @@
                     <button class="btn secondary" id="clearMsg" type="button">Vaciar</button>
                 </div>
                 <div class="field">
-                    <button class="btn" id="enviar" type="button">Enviar placa (30s)</button>
+                    <button class="btn" id="enviar" type="button">Enviar placa (60s)</button>
                     <button class="btn secondary" id="limpiar" type="button">Limpiar selección</button>
                 </div>
             </div>
@@ -56,15 +56,16 @@
                 </div>
             </div>
 
-            <!-- Videos Promocionales -->
+            <!-- Videos/Imágenes -->
             <div class="card">
-                <h2>Videos Promocionales</h2>
+                <h2>Videos/Imágenes</h2>
                 <div class="field">
-                    <input id="videoFile" type="file" accept="video/mp4,video/webm" />
+                    <input id="videoFile" type="file" accept="video/mp4,video/webm,image/*" />
                     <span id="videoName" class="small">Ningún archivo seleccionado</span>
                 </div>
                 <div class="field">
-                    <button class="btn" id="btnPlayVideo" type="button">Reproducir (loop)</button>
+                    <button class="btn" id="btnPlayVideo" type="button">Reproducir Video (loop)</button>
+                    <button class="btn" id="btnShowImage" type="button">Mostrar Imagen</button>
                     <button class="btn secondary" id="btnPauseResume" type="button">Pausar</button>
                     <button class="btn warn" id="btnStopVideo" type="button">Detener/Ir a Reloj</button>
                 </div>
